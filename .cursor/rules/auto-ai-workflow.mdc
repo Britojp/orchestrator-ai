@@ -1,0 +1,36 @@
+---
+description: Fluxo Git/PR do auto-ai e proibição de produção
+alwaysApply: true
+---
+
+# auto-ai — regras obrigatórias
+
+Consulte `REGRAS-DESENVOLVIMENTO.md` para o documento completo.
+
+## Fluxo único permitido
+
+1. Atualizar `develop` (`fetch` + `checkout` + `pull`)
+2. Criar branch `agent/task-{id}` **a partir de** `develop`
+3. Implementar e commitar **somente** na branch agent
+4. Orquestrador faz `push` da branch agent
+5. Orquestrador abre PR: **base = develop**, **head = branch agent**
+
+Nunca commitar direto em `develop`. Nunca fazer merge local em `develop`.
+
+## Produção
+
+- **Nunca** executar deploy, release ou comandos contra ambiente de produção
+- `REPO_PATH` é clone local de desenvolvimento, não servidor prod
+- Worker não deve rodar com `ENVIRONMENT=production`
+
+## MCP Supabase do projeto
+
+- Agente usa MCP oficial com `read_only=true` e `features=database,docs`
+- Apenas SELECT / consulta de schema — sem migrations nem writes
+- `PROJECT_SUPABASE_*` aponta para projeto de **dev**, não produção
+
+## Código do orquestrador
+
+- Regras centralizadas em `src/workflow/workflow-rules.ts`
+- Validar push e base do PR antes de executar
+- Não enfraquecer validações sem atualizar `REGRAS-DESENVOLVIMENTO.md`
