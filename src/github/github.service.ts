@@ -49,7 +49,7 @@ export class GithubService implements OnModuleInit {
 
     assertBranchAllowedForPush(branchName);
 
-    const title = `[auto-ai] ${task.title}`;
+    const title = `[orchestrator-ai] ${task.title}`;
     const body = this.buildPrBody(task, implementationSummary);
     const base = WORKFLOW_BRANCH_BASE;
     assertPrBaseAllowed(base);
@@ -99,7 +99,7 @@ export class GithubService implements OnModuleInit {
       '',
       '## Tarefa',
       `- ID: \`${task.id}\``,
-      `- Gerado por: auto-ai`,
+      `- Gerado por: orchestrator-ai`,
     ].join('\n');
   }
 
@@ -151,9 +151,9 @@ export class GithubService implements OnModuleInit {
           'POST',
           `repos/${repo}/pulls`,
           '-f',
-          'title=auto-ai-permission-probe',
+          'title=orchestrator-ai-permission-probe',
           '-f',
-          'head=__auto_ai_permission_probe__',
+          'head=__orchestrator_ai_permission_probe__',
           '-f',
           `base=${base}`,
         ],

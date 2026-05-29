@@ -1,4 +1,4 @@
-# Backlog — auto-ai (MVP)
+# Backlog — orchestrator-ai (MVP)
 
 Tarefas derivadas de [ESPECIFICACOES.md](./ESPECIFICACOES.md).  
 Escopo: **um repositório**, **NestJS + BullMQ**, **Cursor SDK local**, fila via **Supabase**.
@@ -124,7 +124,7 @@ Legenda de status: `todo` | `doing` | `done`
 | ID | Tarefa | Depende de | Critério de pronto |
 |----|--------|------------|-------------------|
 | 9.1 | `GithubService.createPullRequest(...)` via `gh` | 0.3 | PR criado com `--base develop` |
-| 9.2 | Título: `[auto-ai] {title}` | 9.1 | Formato padronizado |
+| 9.2 | Título: `[orchestrator-ai] {title}` | 9.1 | Formato padronizado |
 | 9.3 | Corpo: resumo IA + critérios de aceite + `taskId` | 9.1, 8.6 | Markdown legível |
 | 9.4 | Retornar `pr_url` e `pr_number` | 9.1 | Parse da saída do `gh` |
 | 9.5 | Idempotência: se PR já existe para branch, reutilizar URL | 9.1 | Não falha em re-run |

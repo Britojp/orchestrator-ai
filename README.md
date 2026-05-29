@@ -1,4 +1,4 @@
-# auto-ai
+# orchestrator-ai
 
 Orquestrador que lê tarefas no Supabase, executa mudanças via Cursor SDK em um repositório fixo e abre Pull Request para `develop`.
 
@@ -65,7 +65,7 @@ Preencha todas as variáveis obrigatórias.
 
 | Variável | Uso |
 |----------|-----|
-| `SUPABASE_*` | Fila de tarefas do **auto-ai** |
+| `SUPABASE_*` | Fila de tarefas do **orchestrator-ai** |
 | `PROJECT_SUPABASE_*` | MCP **somente leitura** no projeto do app que o agente altera |
 
 Gere o PAT em [Supabase → Access Tokens](https://supabase.com/dashboard/account/tokens). Use projeto de **desenvolvimento**, não produção.

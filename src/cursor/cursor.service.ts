@@ -203,6 +203,6 @@ export class CursorService implements OnModuleInit {
       return result.result.trim();
     }
     void run;
-    return 'Implementação realizada pelo agente auto-ai.';
+    return 'Implementação realizada pelo agente orchestrator-ai.';
   }
 }

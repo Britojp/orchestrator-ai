@@ -72,7 +72,7 @@ export function assertNonProductionEnvironment(env: EnvConfig): void {
     )
   ) {
     throw new Error(
-      `ENVIRONMENT="${env.ENVIRONMENT}" proibido. O auto-ai nunca roda em produção.`,
+      `ENVIRONMENT="${env.ENVIRONMENT}" proibido. O orchestrator-ai nunca roda em produção.`,
     );
   }
 }

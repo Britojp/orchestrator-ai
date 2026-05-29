@@ -1,4 +1,4 @@
-# Especificações — Agente autônomo (auto-ai)
+# Especificações — Agente autônomo (orchestrator-ai)
 
 Documento de referência para implementação do orquestrador de tarefas com agente Cursor, Supabase e fluxo Git/PR.
 
@@ -368,7 +368,7 @@ Use o MCP Supabase para consultar a tarefa id = {taskId} se precisar de contexto
 
 ### 7.2 Formato do PR
 
-- **Título:** `[auto-ai] {title} (#{taskId})`
+- **Título:** `[orchestrator-ai] {title} (#{taskId})`
 - **Corpo:** descrição da tarefa + link para registro no Supabase (se houver UI) + checklist de aceite copiado da tarefa.
 
 ### 7.3 Cloud SDK (opcional)
@@ -436,7 +436,7 @@ Backlog detalhado (IDs, dependências, critérios): **[TAREFAS.md](./TAREFAS.md)
 
 ---
 
-## 11. Critérios de aceite do projeto auto-ai
+## 11. Critérios de aceite do projeto orchestrator-ai
 
 1. Inserir linha em `tasks` com status `pending` dispara processamento automático em até `POLL_INTERVAL_MS`.
 2. Ao concluir, existe PR aberto contra `develop` e `pr_url` preenchido.

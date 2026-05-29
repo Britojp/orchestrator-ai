@@ -1,9 +1,9 @@
 ---
-description: Fluxo Git/PR do auto-ai e proibição de produção
+description: Fluxo Git/PR do orchestrator-ai e proibição de produção
 alwaysApply: true
 ---
 
-# auto-ai — regras obrigatórias
+# orchestrator-ai — regras obrigatórias
 
 Consulte `REGRAS-DESENVOLVIMENTO.md` para o documento completo.
 

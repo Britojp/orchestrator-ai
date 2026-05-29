@@ -1,4 +1,4 @@
-# Regras de desenvolvimento — auto-ai
+# Regras de desenvolvimento — orchestrator-ai
 
 Regras **obrigatórias** para o orquestrador, o agente (Cursor) e quem opera o sistema. Violações devem falhar a tarefa, não ser ignoradas.
 
@@ -12,7 +12,7 @@ Regras **obrigatórias** para o orquestrador, o agente (Cursor) e quem opera o s
 | `NODE_ENV=production` no worker | `NODE_ENV=development` (padrão do worker) |
 | Deploy, release, promote, rollback em prod | Apenas código no Git + PR |
 | Alterar secrets/vars de produção | Secrets só no `.env` do worker (fora do repo alvo) |
-| Conectar ao banco/API **de produção** do app alvo | Apenas Supabase do **auto-ai** (fila de tarefas) |
+| Conectar ao banco/API **de produção** do app alvo | Apenas Supabase do **orchestrator-ai** (fila de tarefas) |
 | `kubectl apply`, Terraform apply em prod, `vercel --prod`, etc. | Nada que publique em prod |
 
 O `REPO_PATH` deve ser um **clone de desenvolvimento** do repositório, nunca o servidor de produção.
@@ -91,7 +91,7 @@ Trabalho sempre em `agent/*` criada a partir de `develop`.
 
 ## 4. Supabase
 
-### 4.1 Fila auto-ai (orquestrador)
+### 4.1 Fila orchestrator-ai (orquestrador)
 
 - `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`: tabela `tasks` apenas.
 - Service role só no worker; nunca no frontend.
@@ -150,7 +150,7 @@ A tarefa deve ir para `failed` (ou retry) se:
 | PR (`gh`) | `src/github/github.service.ts` |
 | Prompt Cursor | `src/cursor/cursor.service.ts` |
 | MCP read-only do projeto | `src/cursor/project-supabase-mcp.factory.ts` |
-| Regra Cursor IDE | `.cursor/rules/auto-ai-workflow.mdc` |
+| Regra Cursor IDE | `.cursor/rules/orchestrator-ai-workflow.mdc` |
 
 ---
 
