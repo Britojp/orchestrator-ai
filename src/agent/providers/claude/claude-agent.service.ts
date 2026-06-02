@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 import { EnvConfig } from '../../../config/env.schema';
 import { TaskRecord } from '../../../supabase/task.types';
 import { AgentRunResult, IAgentProvider } from '../../agent-provider.interface';
-import { CLAUDE_TOOLS, executeToolCall } from './claude-tools';
+import { CLAUDE_TOOLS, executeToolCall } from '../../tools/agent-tools';
 
 const MAX_ITERATIONS = 50;
 

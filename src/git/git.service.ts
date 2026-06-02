@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { access } from 'fs/promises';
-import { execa } from 'execa';
 import { ENV_CONFIG } from '../config/config.tokens';
 import { EnvConfig } from '../config/env.schema';
+import { getExeca } from '../common/execa-loader';
 import {
   assertBranchAllowedForPush,
   WORKFLOW_BRANCH_BASE,
@@ -74,6 +74,16 @@ export class GitService implements OnModuleInit {
     return parseInt(stdout.trim(), 10) > 0;
   }
 
+  async commitPendingChanges(taskId: string, summary: string): Promise<boolean> {
+    const { stdout: changes } = await this.runGit(['status', '--porcelain']);
+    if (!changes.trim()) {
+      return false;
+    }
+    await this.runGit(['add', '-A']);
+    await this.runGit(['commit', '-m', this.buildCommitMessage(taskId, summary)]);
+    return true;
+  }
+
   async push(branchName: string): Promise<void> {
     assertBranchAllowedForPush(branchName);
     if (branchName === this.env.BRANCH_BASE) {
@@ -126,7 +136,20 @@ export class GitService implements OnModuleInit {
     }
   }
 
+  private buildCommitMessage(taskId: string, summary: string): string {
+    const firstLine = summary
+      .split('\n')
+      .map((line) => line.trim())
+      .find((line) => line.length > 0);
+    if (!firstLine) {
+      return `chore(agent): implementar tarefa ${taskId}`;
+    }
+    const normalized = firstLine.replace(/\s+/g, ' ');
+    return `chore(agent): ${normalized}`.slice(0, 120);
+  }
+
   private async runGit(args: string[]) {
+    const execa = await getExeca();
     return execa('git', args, {
       cwd: this.env.REPO_PATH,
       env: process.env,

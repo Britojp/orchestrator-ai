@@ -1,7 +1,7 @@
 import { Agent, CursorAgentError, Run, RunResult } from '@cursor/sdk';
 import type { SDKMessage } from '@cursor/sdk';
 import { Logger } from '@nestjs/common';
-import { execa } from 'execa';
+import { getExeca } from '../../../common/execa-loader';
 import { EnvConfig } from '../../../config/env.schema';
 import { TaskRecord } from '../../../supabase/task.types';
 import { buildAgentPromptSections } from '../../../workflow/workflow-rules';
@@ -116,6 +116,7 @@ export class CursorAgentService implements IAgentProvider {
   }
 
   private async verifyCursorCli(): Promise<void> {
+    const execa = await getExeca();
     for (const cmd of ['agent', 'cursor']) {
       try {
         const { stdout } = await execa(cmd, ['--version'], {

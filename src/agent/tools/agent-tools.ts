@@ -1,8 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Logger } from '@nestjs/common';
-import { execa } from 'execa';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { getExeca } from '../../common/execa-loader';
 
 export const CLAUDE_TOOLS: Anthropic.Tool[] = [
   {
@@ -95,9 +95,29 @@ async function listDirectory(repoPath: string, relPath = '.'): Promise<string> {
   return lines.join('\n');
 }
 
+const BLOCKED_GIT_ADD_PATTERNS = [
+  /\bgit\s+add\s+\./,
+  /\bgit\s+add\s+-[a-zA-Z]*A/,
+  /\bgit\s+add\s+--all\b/,
+  /\bgit\s+add\s+\*/,
+];
+
+const BLOCKED_PATHS = ['node_modules', 'dist', '.next', 'build', 'coverage', '.env'];
+
 async function runBash(repoPath: string, command: string, logger: Logger): Promise<string> {
+  for (const pattern of BLOCKED_GIT_ADD_PATTERNS) {
+    if (pattern.test(command)) {
+      return (
+        `Error: broad "git add" is not allowed (matched: ${pattern}). ` +
+        `Stage files explicitly (e.g. git add src/foo.ts). ` +
+        `Never stage: ${BLOCKED_PATHS.join(', ')}.`
+      );
+    }
+  }
+
   logger.log(`run_bash: ${command.slice(0, 200)}`);
   try {
+    const execa = await getExeca();
     const { stdout, stderr } = await execa('bash', ['-c', command], {
       cwd: repoPath,
       timeout: 120_000,

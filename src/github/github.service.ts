@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { execa } from 'execa';
 import { ENV_CONFIG } from '../config/config.tokens';
 import { EnvConfig } from '../config/env.schema';
 import { TaskRecord } from '../supabase/task.types';
+import { getExeca } from '../common/execa-loader';
 import {
   assertBranchAllowedForPush,
   assertPrBaseAllowed,
@@ -22,6 +22,7 @@ export class GithubService implements OnModuleInit {
   constructor(@Inject(ENV_CONFIG) private readonly env: EnvConfig) {}
 
   async onModuleInit(): Promise<void> {
+    const execa = await getExeca();
     this.ghCommand = this.env.GH_CLI_PATH?.trim() || 'gh';
     try {
       const { stdout } = await execa(this.ghCommand, ['--version'], {
@@ -41,6 +42,7 @@ export class GithubService implements OnModuleInit {
     branchName: string,
     implementationSummary: string,
   ): Promise<PullRequestResult> {
+    const execa = await getExeca();
     const existing = await this.findExistingPr(branchName);
     if (existing) {
       this.logger.log(`PR existente: ${existing.prUrl}`);
@@ -106,6 +108,7 @@ export class GithubService implements OnModuleInit {
   private async findExistingPr(
     branchName: string,
   ): Promise<PullRequestResult | null> {
+    const execa = await getExeca();
     try {
       const { stdout } = await execa(
         this.ghCommand,
@@ -139,6 +142,7 @@ export class GithubService implements OnModuleInit {
   }
 
   private async assertCanCreatePullRequests(): Promise<void> {
+    const execa = await getExeca();
     const repo = this.env.TARGET_REPO;
     const base = WORKFLOW_BRANCH_BASE;
 

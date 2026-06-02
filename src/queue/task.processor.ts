@@ -60,7 +60,19 @@ export class TaskProcessor extends WorkerHost {
         agentResult.agentId,
       );
 
-      const hasCommits = await this.gitService.hasCommitsAheadOfBase(branchName);
+      let hasCommits = await this.gitService.hasCommitsAheadOfBase(branchName);
+      if (!hasCommits) {
+        const committed = await this.gitService.commitPendingChanges(
+          taskId,
+          agentResult.summary,
+        );
+        if (committed) {
+          this.logger.log(
+            `Commit automático aplicado para tarefa ${taskId} na branch ${branchName}`,
+          );
+          hasCommits = await this.gitService.hasCommitsAheadOfBase(branchName);
+        }
+      }
       if (!hasCommits) {
         throw new Error('Agente não produziu commits na branch');
       }

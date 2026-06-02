@@ -13,11 +13,13 @@ export const envSchema = z.object({
       message:
         'Use a chave service_role (Settings → API), não a publishable/anon',
     }),
-  AI_PROVIDER: z.enum(['cursor', 'claude']).default('cursor'),
+  AI_PROVIDER: z.enum(['cursor', 'claude', 'ollama']).default('cursor'),
   CURSOR_API_KEY: z.string().optional(),
   CURSOR_MODEL: z.string().default('composer-2.5'),
   ANTHROPIC_API_KEY: z.string().optional(),
   CLAUDE_MODEL: z.string().default('claude-sonnet-4-6'),
+  OLLAMA_BASE_URL: z.string().url().default('http://127.0.0.1:11434'),
+  OLLAMA_MODEL: z.string().default('qwen2.5-coder:7b'),
   TARGET_REPO: z.string().regex(/^[\w.-]+\/[\w.-]+$/),
   REPO_PATH: z.string().min(1),
   BRANCH_BASE: z
@@ -56,6 +58,13 @@ export const envSchema = z.object({
         code: z.ZodIssueCode.custom,
         path: ['ANTHROPIC_API_KEY'],
         message: 'Obrigatório quando AI_PROVIDER=claude',
+      });
+    }
+    if (data.AI_PROVIDER === 'ollama' && !data.OLLAMA_MODEL.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['OLLAMA_MODEL'],
+        message: 'Obrigatório quando AI_PROVIDER=ollama',
       });
     }
     if (!data.PROJECT_SUPABASE_MCP_ENABLED) {
