@@ -1,7 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job, UnrecoverableError } from 'bullmq';
-import { CursorService } from '../cursor/cursor.service';
+import { AgentService } from '../agent/agent.service';
 import { GitService } from '../git/git.service';
 import { GithubService } from '../github/github.service';
 import { TasksRepository } from '../supabase/tasks.repository';
@@ -24,7 +24,7 @@ export class TaskProcessor extends WorkerHost {
   constructor(
     private readonly tasksRepository: TasksRepository,
     private readonly gitService: GitService,
-    private readonly cursorService: CursorService,
+    private readonly agentService: AgentService,
     private readonly githubService: GithubService,
   ) {
     super();
@@ -53,11 +53,11 @@ export class TaskProcessor extends WorkerHost {
       const branchName = await this.gitService.prepareBranch(taskId);
       await this.tasksRepository.saveBranchName(taskId, branchName);
 
-      const cursorResult = await this.cursorService.runTask(task, branchName);
+      const agentResult = await this.agentService.runTask(task, branchName);
       await this.tasksRepository.markStarted(
         taskId,
-        cursorResult.runId,
-        cursorResult.agentId,
+        agentResult.runId,
+        agentResult.agentId,
       );
 
       const hasCommits = await this.gitService.hasCommitsAheadOfBase(branchName);
@@ -70,15 +70,15 @@ export class TaskProcessor extends WorkerHost {
       const pr = await this.githubService.createPullRequest(
         task,
         branchName,
-        cursorResult.summary,
+        agentResult.summary,
       );
 
       await this.tasksRepository.markDone(taskId, {
         prUrl: pr.prUrl,
         prNumber: pr.prNumber,
         branchName,
-        agentRunId: cursorResult.runId,
-        agentAgentId: cursorResult.agentId,
+        agentRunId: agentResult.runId,
+        agentAgentId: agentResult.agentId,
       });
 
       this.logEvent(taskId, 'completed', started, { prUrl: pr.prUrl });

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
+import { AgentModule } from './agent/agent.module';
 import { ConfigModule } from './config/config.module';
-import { CursorModule } from './cursor/cursor.module';
 import { GitModule } from './git/git.module';
 import { GithubModule } from './github/github.module';
 import { QueueModule } from './queue/queue.module';
@@ -12,7 +12,7 @@ import { SupabaseModule } from './supabase/supabase.module';
     ConfigModule,
     SupabaseModule,
     GitModule,
-    CursorModule,
+    AgentModule,
     GithubModule,
     QueueModule,
     SchedulerModule,

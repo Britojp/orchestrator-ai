@@ -13,8 +13,11 @@ export const envSchema = z.object({
       message:
         'Use a chave service_role (Settings → API), não a publishable/anon',
     }),
-  CURSOR_API_KEY: z.string().min(1),
+  AI_PROVIDER: z.enum(['cursor', 'claude']).default('cursor'),
+  CURSOR_API_KEY: z.string().optional(),
   CURSOR_MODEL: z.string().default('composer-2.5'),
+  ANTHROPIC_API_KEY: z.string().optional(),
+  CLAUDE_MODEL: z.string().default('claude-sonnet-4-6'),
   TARGET_REPO: z.string().regex(/^[\w.-]+\/[\w.-]+$/),
   REPO_PATH: z.string().min(1),
   BRANCH_BASE: z
@@ -41,6 +44,20 @@ export const envSchema = z.object({
   PROJECT_SUPABASE_ACCESS_TOKEN: z.string().min(1).optional(),
 })
   .superRefine((data, ctx) => {
+    if (data.AI_PROVIDER === 'cursor' && !data.CURSOR_API_KEY?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['CURSOR_API_KEY'],
+        message: 'Obrigatório quando AI_PROVIDER=cursor',
+      });
+    }
+    if (data.AI_PROVIDER === 'claude' && !data.ANTHROPIC_API_KEY?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['ANTHROPIC_API_KEY'],
+        message: 'Obrigatório quando AI_PROVIDER=claude',
+      });
+    }
     if (!data.PROJECT_SUPABASE_MCP_ENABLED) {
       return;
     }

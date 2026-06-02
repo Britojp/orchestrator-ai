@@ -1,44 +1,23 @@
 import { Agent, CursorAgentError, Run, RunResult } from '@cursor/sdk';
 import type { SDKMessage } from '@cursor/sdk';
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { execa } from 'execa';
-import { ENV_CONFIG } from '../config/config.tokens';
-import { EnvConfig } from '../config/env.schema';
-import { TaskRecord } from '../supabase/task.types';
-import { buildAgentPromptSections } from '../workflow/workflow-rules';
+import { EnvConfig } from '../../../config/env.schema';
+import { TaskRecord } from '../../../supabase/task.types';
+import { buildAgentPromptSections } from '../../../workflow/workflow-rules';
+import { AgentRunResult, IAgentProvider } from '../../agent-provider.interface';
 import { buildProjectSupabaseMcpConfig } from './project-supabase-mcp.factory';
 
-export interface CursorRunResult {
-  summary: string;
-  runId: string;
-  agentId: string;
-}
+export class CursorAgentService implements IAgentProvider {
+  private readonly logger = new Logger(CursorAgentService.name);
 
-@Injectable()
-export class CursorService implements OnModuleInit {
-  private readonly logger = new Logger(CursorService.name);
+  constructor(private readonly env: EnvConfig) {}
 
-  constructor(@Inject(ENV_CONFIG) private readonly env: EnvConfig) {}
-
-  async onModuleInit(): Promise<void> {
+  async init(): Promise<void> {
     await this.verifyCursorCli();
   }
 
-  buildPrompt(task: TaskRecord, branchName: string): string {
-    const base = this.env.BRANCH_BASE;
-    return buildAgentPromptSections({
-      taskId: task.id,
-      targetRepo: this.env.TARGET_REPO,
-      branchName,
-      branchBase: base,
-      title: task.title,
-      description: task.description,
-      acceptanceCriteria: task.acceptance_criteria,
-      projectMcpEnabled: this.env.PROJECT_SUPABASE_MCP_ENABLED,
-    });
-  }
-
-  async runTask(task: TaskRecord, branchName: string): Promise<CursorRunResult> {
+  async runTask(task: TaskRecord, branchName: string): Promise<AgentRunResult> {
     const prompt = this.buildPrompt(task, branchName);
     const mcpServers = buildProjectSupabaseMcpConfig(this.env);
 
@@ -56,7 +35,7 @@ export class CursorService implements OnModuleInit {
 
     try {
       await using agent = await Agent.create({
-        apiKey: this.env.CURSOR_API_KEY,
+        apiKey: this.env.CURSOR_API_KEY!,
         model: { id: this.env.CURSOR_MODEL },
         local: { cwd: this.env.REPO_PATH, settingSources: [] },
         ...(mcpServers ? { mcpServers } : {}),
@@ -90,6 +69,19 @@ export class CursorService implements OnModuleInit {
       }
       throw error;
     }
+  }
+
+  private buildPrompt(task: TaskRecord, branchName: string): string {
+    return buildAgentPromptSections({
+      taskId: task.id,
+      targetRepo: this.env.TARGET_REPO,
+      branchName,
+      branchBase: this.env.BRANCH_BASE,
+      title: task.title,
+      description: task.description,
+      acceptanceCriteria: task.acceptance_criteria,
+      projectMcpEnabled: this.env.PROJECT_SUPABASE_MCP_ENABLED,
+    });
   }
 
   private async consumeStream(run: Run, streamLog: string[]): Promise<void> {
@@ -174,7 +166,7 @@ export class CursorService implements OnModuleInit {
 
     if (!parts.length) {
       parts.push(
-        'Sem detalhe do Cursor. Teste: cd REPO_PATH && agent -p -f "ok". Verifique CURSOR_API_KEY e cota da conta.',
+        'Sem detalhe do Cursor. Verifique CURSOR_API_KEY e cota da conta.',
       );
     }
 
@@ -191,9 +183,7 @@ export class CursorService implements OnModuleInit {
       blob.includes('usage limit') ||
       blob.includes('increase your limit')
     ) {
-      return (
-        'Cota do Cursor esgotada (out of usage). Aumente o limite no dashboard, troque o modelo (ex.: CURSOR_MODEL=auto) ou aguarde renovação do plano.'
-      );
+      return 'Cota do Cursor esgotada. Aumente o limite no dashboard ou troque o modelo.';
     }
     return null;
   }

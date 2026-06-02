@@ -13,6 +13,7 @@
     "queue:unstuck": "node scripts/queue-unstuck.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
     "@bull-board/api": "^7.1.5",
     "@bull-board/express": "^7.1.5",
     "@bull-board/nestjs": "^7.1.5",

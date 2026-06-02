@@ -5,7 +5,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ENV_CONFIG } from '../config/config.tokens';
 import { EnvConfig } from '../config/env.schema';
-import { CursorModule } from '../cursor/cursor.module';
+import { AgentModule } from '../agent/agent.module';
 import { GitModule } from '../git/git.module';
 import { GithubModule } from '../github/github.module';
 import { SupabaseModule } from '../supabase/supabase.module';
@@ -33,7 +33,7 @@ import { TaskProducer } from './task.producer';
     }),
     SupabaseModule,
     GitModule,
-    CursorModule,
+    AgentModule,
     GithubModule,
   ],
   providers: [QueueRecoveryService, TaskProducer, TaskProcessor],

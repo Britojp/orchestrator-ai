@@ -1,5 +1,5 @@
 import type { McpServerConfig } from '@cursor/sdk';
-import { EnvConfig } from '../config/env.schema';
+import { EnvConfig } from '../../../config/env.schema';
 
 const MCP_HOSTED_URL = 'https://mcp.supabase.com/mcp';
 
