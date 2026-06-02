@@ -8,5 +8,5 @@ export interface AgentRunResult {
 
 export interface IAgentProvider {
   init?(): Promise<void>;
-  runTask(task: TaskRecord, branchName: string): Promise<AgentRunResult>;
+  runTask(task: TaskRecord, branchName: string, workDir: string): Promise<AgentRunResult>;
 }

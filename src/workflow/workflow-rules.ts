@@ -16,22 +16,26 @@ export function assertBranchAllowedForPush(branchName: string): void {
   const normalized = branchName.trim().toLowerCase();
   if (BRANCHES_FORBIDDEN_FOR_PUSH.includes(normalized as (typeof BRANCHES_FORBIDDEN_FOR_PUSH)[number])) {
     throw new Error(
-      `Push proibido na branch "${branchName}". Use apenas branches agent/task-{id}.`,
+      `Push proibido na branch "${branchName}". Use apenas branches agent/task-{id} ou feature/task-{id}.`,
     );
   }
   const workPrefix = (process.env.BRANCH_PREFIX ?? 'agent/task').toLowerCase();
-  if (!normalized.startsWith(workPrefix) && !normalized.startsWith('agent/')) {
+  if (
+    !normalized.startsWith(workPrefix) &&
+    !normalized.startsWith('agent/') &&
+    !normalized.startsWith('feature/task-')
+  ) {
     throw new Error(
-      `Push permitido apenas em branches de trabalho do agente (prefixo: ${workPrefix}).`,
+      `Push permitido apenas em branches de trabalho do agente (prefixo: ${workPrefix} ou feature/task-).`,
     );
   }
 }
 
 export function assertPrBaseAllowed(baseBranch: string): void {
   const expected = process.env.BRANCH_BASE ?? WORKFLOW_BRANCH_BASE;
-  if (baseBranch !== expected) {
+  if (baseBranch !== expected && !baseBranch.startsWith('feature/task-')) {
     throw new Error(
-      `PR deve ter base "${expected}". Tentativa com base "${baseBranch}" rejeitada.`,
+      `Base do PR inválida: "${baseBranch}". Use "${expected}" ou feature/task-{id}.`,
     );
   }
 }
@@ -83,6 +87,7 @@ export function buildAgentPromptSections(params: {
     '- NUNCA altere secrets, variáveis de ambiente ou infra de produção',
     '- NUNCA faça checkout/commit em develop, main, master ou production',
     '- NUNCA faça push (nem local para origin) — o orquestrador faz o push',
+    '- NUNCA adicione ao git: node_modules, dist, build, coverage, .cache, arquivos .env, arquivos .log ou qualquer artefato gerado — faça git add apenas em arquivos de código-fonte ou verifique o .gitignore antes de usar git add -A',
     '- NUNCA merge para develop localmente',
     '- NUNCA abra ou merge Pull Request — o orquestrador abre PR com base develop',
     '- NUNCA conecte ou execute migrações no banco de dados de produção do app',

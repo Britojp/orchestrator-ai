@@ -6,6 +6,7 @@ import { Module } from '@nestjs/common';
 import { ENV_CONFIG } from '../config/config.tokens';
 import { EnvConfig } from '../config/env.schema';
 import { AgentModule } from '../agent/agent.module';
+import { DecomposerService } from '../decomposer/decomposer.service';
 import { GitModule } from '../git/git.module';
 import { GithubModule } from '../github/github.module';
 import { SupabaseModule } from '../supabase/supabase.module';
@@ -36,7 +37,7 @@ import { TaskProducer } from './task.producer';
     AgentModule,
     GithubModule,
   ],
-  providers: [QueueRecoveryService, TaskProducer, TaskProcessor],
+  providers: [QueueRecoveryService, TaskProducer, DecomposerService, TaskProcessor],
   exports: [TaskProducer],
 })
 export class QueueModule {}

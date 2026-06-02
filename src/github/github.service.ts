@@ -41,6 +41,7 @@ export class GithubService implements OnModuleInit {
     task: TaskRecord,
     branchName: string,
     implementationSummary: string,
+    base?: string,
   ): Promise<PullRequestResult> {
     const execa = await getExeca();
     const existing = await this.findExistingPr(branchName);
@@ -53,11 +54,11 @@ export class GithubService implements OnModuleInit {
 
     const title = `[orchestrator-ai] ${task.title}`;
     const body = this.buildPrBody(task, implementationSummary);
-    const base = WORKFLOW_BRANCH_BASE;
-    assertPrBaseAllowed(base);
+    const prBase = base ?? WORKFLOW_BRANCH_BASE;
+    assertPrBaseAllowed(prBase);
 
-    if (branchName === base) {
-      throw new Error('Head do PR não pode ser develop. Use a branch agent/task-{id}.');
+    if (branchName === prBase) {
+      throw new Error(`Head do PR não pode ser igual à base (${prBase}).`);
     }
 
     try {
@@ -69,7 +70,7 @@ export class GithubService implements OnModuleInit {
           '--repo',
           this.env.TARGET_REPO,
           '--base',
-          base,
+          prBase,
           '--head',
           branchName,
           '--title',

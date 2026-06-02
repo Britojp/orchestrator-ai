@@ -41,9 +41,9 @@ export class OllamaAgentService implements IAgentProvider {
     }
   }
 
-  async runTask(task: TaskRecord, branchName: string): Promise<AgentRunResult> {
+  async runTask(task: TaskRecord, branchName: string, workDir: string): Promise<AgentRunResult> {
     const runId = randomUUID();
-    this.logger.log(`[${runId}] iniciando — modelo: ${this.env.OLLAMA_MODEL}  repo: ${this.env.REPO_PATH}  task: ${task.id}`);
+    this.logger.log(`[${runId}] iniciando — modelo: ${this.env.OLLAMA_MODEL}  worktree: ${workDir}  task: ${task.id}`);
 
     const messages: OllamaMessage[] = [
       { role: 'system', content: this.buildSystemPrompt() },
@@ -93,7 +93,7 @@ export class OllamaAgentService implements IAgentProvider {
         const toolResult = await executeToolCall(
           toolName,
           toolInput,
-          this.env.REPO_PATH,
+          workDir,
           this.logger,
         );
 

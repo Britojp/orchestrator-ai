@@ -3,7 +3,9 @@ export type TaskStatus =
   | 'in_progress'
   | 'done'
   | 'failed'
-  | 'cancelled';
+  | 'cancelled'
+  | 'waiting_subtasks'
+  | 'blocked';
 
 export interface TaskRecord {
   id: string;
@@ -27,4 +29,7 @@ export interface TaskRecord {
   failed_at: string | null;
   created_at: string;
   updated_at: string;
+  parent_task_id: string | null;
+  feature_branch: string | null;
+  depends_on: string[];
 }

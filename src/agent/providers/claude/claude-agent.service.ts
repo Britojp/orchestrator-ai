@@ -58,11 +58,11 @@ export class ClaudeAgentService implements IAgentProvider {
     this.client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   }
 
-  async runTask(task: TaskRecord, branchName: string): Promise<AgentRunResult> {
+  async runTask(task: TaskRecord, branchName: string, workDir: string): Promise<AgentRunResult> {
     const userMessage = this.buildUserMessage(task, branchName);
     const runId = randomUUID();
     this.logger.log(
-      `Iniciando Claude em ${this.env.REPO_PATH} (modelo ${this.env.CLAUDE_MODEL}), runId=${runId}`,
+      `Iniciando Claude em ${workDir} (modelo ${this.env.CLAUDE_MODEL}), runId=${runId}`,
     );
 
     const messages: Anthropic.MessageParam[] = [
@@ -124,7 +124,7 @@ export class ClaudeAgentService implements IAgentProvider {
           const result = await executeToolCall(
             block.name,
             block.input as Record<string, string>,
-            this.env.REPO_PATH,
+            workDir,
             this.logger,
           );
           toolResults.push({

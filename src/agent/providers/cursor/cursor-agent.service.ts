@@ -17,7 +17,7 @@ export class CursorAgentService implements IAgentProvider {
     await this.verifyCursorCli();
   }
 
-  async runTask(task: TaskRecord, branchName: string): Promise<AgentRunResult> {
+  async runTask(task: TaskRecord, branchName: string, workDir: string): Promise<AgentRunResult> {
     const prompt = this.buildPrompt(task, branchName);
     const mcpServers = buildProjectSupabaseMcpConfig(this.env);
 
@@ -28,7 +28,7 @@ export class CursorAgentService implements IAgentProvider {
     }
 
     this.logger.log(
-      `Iniciando Cursor em ${this.env.REPO_PATH} (modelo ${this.env.CURSOR_MODEL})`,
+      `Iniciando Cursor em ${workDir} (modelo ${this.env.CURSOR_MODEL})`,
     );
 
     const streamLog: string[] = [];
@@ -37,7 +37,7 @@ export class CursorAgentService implements IAgentProvider {
       await using agent = await Agent.create({
         apiKey: this.env.CURSOR_API_KEY!,
         model: { id: this.env.CURSOR_MODEL },
-        local: { cwd: this.env.REPO_PATH, settingSources: [] },
+        local: { cwd: workDir, settingSources: [] },
         ...(mcpServers ? { mcpServers } : {}),
       });
 

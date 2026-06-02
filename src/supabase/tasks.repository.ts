@@ -154,6 +154,94 @@ export class TasksRepository implements OnModuleInit {
     }
   }
 
+  async createSubTasks(
+    parentId: string,
+    featureBranch: string,
+    subtasks: Array<{ title: string; description: string; acceptance_criteria: string; depends_on: number[] }>,
+    priority: number,
+  ): Promise<TaskRecord[]> {
+    // Insert without deps first to obtain real UUIDs
+    const rows = subtasks.map((s) => ({
+      title: s.title,
+      description: s.description,
+      acceptance_criteria: s.acceptance_criteria,
+      status: 'pending' as const,
+      priority,
+      parent_task_id: parentId,
+      feature_branch: featureBranch,
+    }));
+
+    const { data, error } = await this.supabase
+      .from('tasks')
+      .insert(rows)
+      .select('*');
+
+    if (error) {
+      throw new Error(`createSubTasks: ${error.message}`);
+    }
+
+    const inserted = data as TaskRecord[];
+    const ids = inserted.map((r) => r.id);
+
+    // Apply dependency graph: map indices → UUIDs, mark as blocked when needed
+    for (let i = 0; i < subtasks.length; i++) {
+      const depIndices = subtasks[i].depends_on;
+      if (!depIndices.length) continue;
+
+      const depIds = depIndices.map((idx) => ids[idx]).filter(Boolean);
+      if (!depIds.length) continue;
+
+      const { error: updErr } = await this.supabase
+        .from('tasks')
+        .update({ depends_on: depIds, status: 'blocked' })
+        .eq('id', ids[i]);
+
+      if (updErr) {
+        throw new Error(`createSubTasks dep update: ${updErr.message}`);
+      }
+
+      inserted[i].depends_on = depIds;
+      inserted[i].status = 'blocked';
+    }
+
+    return inserted;
+  }
+
+  async markWaitingSubtasks(taskId: string, featureBranch: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('tasks')
+      .update({ status: 'waiting_subtasks', feature_branch: featureBranch })
+      .eq('id', taskId);
+
+    if (error) {
+      throw new Error(`markWaitingSubtasks: ${error.message}`);
+    }
+  }
+
+  async allSubtasksDone(parentId: string): Promise<boolean> {
+    const { count, error } = await this.supabase
+      .from('tasks')
+      .select('id', { count: 'exact', head: true })
+      .eq('parent_task_id', parentId)
+      .in('status', ['pending', 'in_progress', 'waiting_subtasks', 'blocked']);
+
+    if (error) {
+      throw new Error(`allSubtasksDone: ${error.message}`);
+    }
+    return (count ?? 1) === 0;
+  }
+
+  async unblockReadySubtasks(completedTaskId: string): Promise<TaskRecord[]> {
+    const { data, error } = await this.supabase.rpc('get_unblocked_subtasks', {
+      p_completed_task_id: completedTaskId,
+    });
+
+    if (error) {
+      throw new Error(`get_unblocked_subtasks: ${error.message}`);
+    }
+    return (data as TaskRecord[]) ?? [];
+  }
+
   async releaseInProgressClaim(
     taskId: string,
     reason: string,

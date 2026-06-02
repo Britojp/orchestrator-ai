@@ -22,6 +22,8 @@ export const envSchema = z.object({
   OLLAMA_MODEL: z.string().default('qwen2.5-coder:7b'),
   TARGET_REPO: z.string().regex(/^[\w.-]+\/[\w.-]+$/),
   REPO_PATH: z.string().min(1),
+  WORKTREE_BASE_PATH: z.string().default('/tmp/orchestrator-worktrees'),
+  AGENT_CONCURRENCY: z.coerce.number().int().min(1).max(10).default(3),
   BRANCH_BASE: z
     .string()
     .default('develop')

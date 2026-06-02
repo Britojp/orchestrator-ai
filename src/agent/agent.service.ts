@@ -15,7 +15,7 @@ export class AgentService implements OnModuleInit {
     }
   }
 
-  runTask(task: TaskRecord, branchName: string): Promise<AgentRunResult> {
-    return this.provider.runTask(task, branchName);
+  runTask(task: TaskRecord, branchName: string, workDir: string): Promise<AgentRunResult> {
+    return this.provider.runTask(task, branchName, workDir);
   }
 }
