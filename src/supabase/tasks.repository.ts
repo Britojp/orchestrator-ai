@@ -184,6 +184,8 @@ export class TasksRepository implements OnModuleInit {
     const ids = inserted.map((r) => r.id);
 
     // Apply dependency graph: map indices → UUIDs, mark as blocked when needed
+    const updatePromises: PromiseLike<any>[] = [];
+
     for (let i = 0; i < subtasks.length; i++) {
       const depIndices = subtasks[i].depends_on;
       if (!depIndices.length) continue;
@@ -191,17 +193,26 @@ export class TasksRepository implements OnModuleInit {
       const depIds = depIndices.map((idx) => ids[idx]).filter(Boolean);
       if (!depIds.length) continue;
 
-      const { error: updErr } = await this.supabase
+      // Prepare promise for the update
+      const promise = this.supabase
         .from('tasks')
         .update({ depends_on: depIds, status: 'blocked' })
-        .eq('id', ids[i]);
+        .eq('id', ids[i])
+        .then(({ error: updErr }) => {
+          if (updErr) {
+            throw new Error(`createSubTasks dep update: ${updErr.message}`);
+          }
+        });
 
-      if (updErr) {
-        throw new Error(`createSubTasks dep update: ${updErr.message}`);
-      }
+      updatePromises.push(promise);
 
+      // We still update the returned array in memory synchronously
       inserted[i].depends_on = depIds;
       inserted[i].status = 'blocked';
+    }
+
+    if (updatePromises.length > 0) {
+      await Promise.all(updatePromises);
     }
 
     return inserted;
