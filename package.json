@@ -2,6 +2,9 @@
   "name": "orchestrator-ai",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "dashboard"
+  ],
   "scripts": {
     "build": "nest build",
     "start": "nest start",

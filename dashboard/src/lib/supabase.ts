@@ -9,7 +9,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Type for the tasks table based on the backend specification
 export interface Task {
   id: string;
   title: string;
