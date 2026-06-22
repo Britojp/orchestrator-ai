@@ -8,7 +8,7 @@ import {
 import { ENV_CONFIG } from '../config/config.tokens';
 import { EnvConfig } from '../config/env.schema';
 import { TaskProducer } from '../queue/task.producer';
-import { TasksRepository } from '../supabase/tasks.repository';
+import { TasksRepository } from '../task/tasks.repository';
 
 @Injectable()
 export class TaskPollerService implements OnModuleInit, OnModuleDestroy {

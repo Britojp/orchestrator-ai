@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { supabase } from '../lib/supabase';
-import type { Task } from '../lib/supabase';
+import type { Task } from '../types';
 import Badge from '../components/Badge.vue';
 import Card from '../components/Card.vue';
 import Button from '../components/Button.vue';
@@ -16,7 +15,7 @@ const task = ref<Task | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
-let subscription: any;
+let pollInterval: ReturnType<typeof setInterval>;
 
 const fetchTask = async () => {
   if (!id.value) return;
@@ -24,13 +23,11 @@ const fetchTask = async () => {
   try {
     loading.value = true;
     error.value = null;
-    const { data, error: err } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('id', id.value)
-      .single();
-
-    if (err) throw err;
+    const response = await fetch(`/api/tasks/${id.value}`);
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    const data = await response.json();
     task.value = data;
   } catch (err: any) {
     error.value = err.message || 'Failed to fetch task details';
@@ -41,23 +38,22 @@ const fetchTask = async () => {
 };
 
 const setupSubscription = () => {
-  if (subscription) {
-    supabase.removeChannel(subscription);
+  if (pollInterval) {
+    clearInterval(pollInterval);
   }
 
   if (!id.value) return;
 
-  subscription = supabase
-    .channel(`task-${id.value}`)
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'tasks',
-      filter: `id=eq.${id.value}`
-    }, (payload) => {
-      task.value = payload.new as Task;
-    })
-    .subscribe();
+  pollInterval = setInterval(async () => {
+    try {
+      const response = await fetch(`/api/tasks/${id.value}`);
+      if (response.ok) {
+        task.value = await response.json();
+      }
+    } catch (e) {
+      console.error('Polling error', e);
+    }
+  }, 5000);
 };
 
 onMounted(() => {
@@ -74,8 +70,8 @@ watch(() => route.params.id, (newId) => {
 });
 
 onUnmounted(() => {
-  if (subscription) {
-    supabase.removeChannel(subscription);
+  if (pollInterval) {
+    clearInterval(pollInterval);
   }
 });
 </script>

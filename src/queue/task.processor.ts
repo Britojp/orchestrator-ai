@@ -7,8 +7,8 @@ import { AgentService } from '../agent/agent.service';
 import { DecomposerService } from '../decomposer/decomposer.service';
 import { GitService } from '../git/git.service';
 import { GithubService } from '../github/github.service';
-import { TasksRepository } from '../supabase/tasks.repository';
-import { TaskRecord } from '../supabase/task.types';
+import { TasksRepository } from '../task/tasks.repository';
+import { TaskRecord } from '../task/task.types';
 import {
   TASK_JOB_EXECUTE,
   TASK_QUEUE_NAME,

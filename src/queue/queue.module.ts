@@ -9,7 +9,7 @@ import { AgentModule } from '../agent/agent.module';
 import { DecomposerService } from '../decomposer/decomposer.service';
 import { GitModule } from '../git/git.module';
 import { GithubModule } from '../github/github.module';
-import { SupabaseModule } from '../supabase/supabase.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { TASK_QUEUE_NAME } from './task.constants';
 import { QueueRecoveryService } from './queue-recovery.service';
 import { TaskProcessor } from './task.processor';
@@ -32,7 +32,7 @@ import { TaskProducer } from './task.producer';
       name: TASK_QUEUE_NAME,
       adapter: BullMQAdapter,
     }),
-    SupabaseModule,
+    PrismaModule,
     GitModule,
     AgentModule,
     GithubModule,

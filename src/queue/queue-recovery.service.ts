@@ -1,7 +1,7 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Job, Queue } from 'bullmq';
-import { TasksRepository } from '../supabase/tasks.repository';
+import { TasksRepository } from '../task/tasks.repository';
 import { TASK_QUEUE_NAME, TaskJobPayload } from './task.constants';
 
 @Injectable()

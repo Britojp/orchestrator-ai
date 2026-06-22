@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { supabase } from '../lib/supabase';
-import type { Task } from '../lib/supabase';
+import type { Task } from '../types';
 import Table from '../components/Table.vue';
 import TableHead from '../components/TableHeader.vue';
 import TableRow from '../components/TableRow.vue';
@@ -21,12 +20,11 @@ const fetchTasks = async () => {
   try {
     loading.value = true;
     error.value = null;
-    const { data, error: err } = await supabase
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (err) throw err;
+    const response = await fetch('/api/tasks');
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    const data = await response.json();
     tasks.value = data || [];
   } catch (err: any) {
     error.value = err.message || 'Failed to fetch tasks';
@@ -36,21 +34,16 @@ const fetchTasks = async () => {
   }
 };
 
-let subscription: any;
+let pollInterval: ReturnType<typeof setInterval>;
 
 onMounted(() => {
   fetchTasks();
-  subscription = supabase
-    .channel('tasks-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-      fetchTasks();
-    })
-    .subscribe();
+  pollInterval = setInterval(fetchTasks, 5000);
 });
 
 onUnmounted(() => {
-  if (subscription) {
-    supabase.removeChannel(subscription);
+  if (pollInterval) {
+    clearInterval(pollInterval);
   }
 });
 </script>

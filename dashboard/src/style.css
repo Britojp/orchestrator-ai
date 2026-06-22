@@ -4,6 +4,6 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 m-0 p-0;
+    @apply bg-primary-50 text-primary-950 m-0 p-0 antialiased;
   }
 }

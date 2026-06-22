@@ -1,33 +1,27 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute } from 'vue-router';
-import { Bot, LayoutDashboard, KanbanSquare } from 'lucide-vue-next';
-import { computed } from 'vue';
-
-const route = useRoute();
-
-const isActive = (path: string) => computed(() =>
-  route.path === path ? 'bg-gray-100 text-primary-700' : 'text-gray-600 hover:bg-gray-50'
-).value;
+import { RouterView } from 'vue-router';
+import Sidebar from './components/Sidebar.vue';
+import ContextPanel from './components/ContextPanel.vue';
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col">
-    <nav class="flex space-x-4 border-b border-gray-200 px-4 py-3 bg-white">
-      <RouterLink to="/" :class="['flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium', isActive('/')]">
-        <LayoutDashboard class="w-4 h-4" />
-        Dashboard
-      </RouterLink>
-      <RouterLink to="/chat" :class="['flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium', isActive('/chat')]">
-        <Bot class="w-4 h-4" />
-        Chat Workspace
-      </RouterLink>
-      <RouterLink to="/kanban" :class="['flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium', isActive('/kanban')]">
-        <KanbanSquare class="w-4 h-4" />
-        Kanban Board
-      </RouterLink>
-    </nav>
-    <main class="flex-1">
+  <div class="h-screen w-full bg-primary-50 flex overflow-hidden text-primary-950 font-sans">
+
+    <!-- Left Column: Navigation / Operations -->
+    <Sidebar />
+
+    <!-- Center Column: Main Workspace Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-white shadow-[0_0_15px_rgba(0,0,0,0.03)] z-10">
       <RouterView />
     </main>
+
+    <!-- Right Column: Context & Details -->
+    <ContextPanel />
+
   </div>
 </template>
+
+<style>
+/* Optional: Global tweaks for smooth scrolling or specific text rendering if needed,
+   though Tailwind base covers most of this. */
+</style>

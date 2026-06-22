@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { supabase } from '../lib/supabase';
-import type { Task } from '../lib/supabase';
+import type { Task } from '../types';
 import KanbanBoard from '../components/KanbanBoard.vue';
 import KanbanColumn from '../components/KanbanColumn.vue';
 import Card from '../components/Card.vue';
@@ -15,12 +14,11 @@ const loading = ref(true);
 const fetchTasks = async () => {
   try {
     loading.value = true;
-    const { data, error } = await supabase
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
+    const response = await fetch('/api/tasks');
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    const data = await response.json();
     tasks.value = data || [];
   } catch (err) {
     console.error('Error fetching tasks:', err);
@@ -29,21 +27,16 @@ const fetchTasks = async () => {
   }
 };
 
-let subscription: any;
+let pollInterval: ReturnType<typeof setInterval>;
 
 onMounted(() => {
   fetchTasks();
-  subscription = supabase
-    .channel('tasks-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-      fetchTasks();
-    })
-    .subscribe();
+  pollInterval = setInterval(fetchTasks, 5000);
 });
 
 onUnmounted(() => {
-  if (subscription) {
-    supabase.removeChannel(subscription);
+  if (pollInterval) {
+    clearInterval(pollInterval);
   }
 });
 
