@@ -7,12 +7,14 @@ import { QueueModule } from './queue/queue.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TaskModule } from './task/task.module';
+import { ConversationContextModule } from './conversation-context/conversation-context.module';
 
 @Module({
   imports: [
     ConfigModule,
     PrismaModule,
     TaskModule,
+    ConversationContextModule,
     GitModule,
     AgentModule,
     GithubModule,

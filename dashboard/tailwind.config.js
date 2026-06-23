@@ -29,6 +29,16 @@ export default {
       },
       boxShadow: {
         'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      },
+      transitionDuration: {
+        'fast': '150ms',
+        'normal': '300ms',
+        'slow': '500ms',
+      },
+      transitionTimingFunction: {
+        'fast': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'normal': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'slow': 'cubic-bezier(0.4, 0, 0.2, 1)',
       }
     },
   },

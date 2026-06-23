@@ -36,6 +36,11 @@ model Message {
   conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
   role            String
   content         String
+
+  prompt          String?
+  provider        String?
+  model           String?
+
   created_at      DateTime     @default(now()) @db.Timestamptz
 
   @@map("messages")
