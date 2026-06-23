@@ -5,12 +5,16 @@ import { GitModule } from './git/git.module';
 import { GithubModule } from './github/github.module';
 import { QueueModule } from './queue/queue.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
-import { SupabaseModule } from './supabase/supabase.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { TaskModule } from './task/task.module';
+import { ConversationContextModule } from './conversation-context/conversation-context.module';
 
 @Module({
   imports: [
     ConfigModule,
-    SupabaseModule,
+    PrismaModule,
+    TaskModule,
+    ConversationContextModule,
     GitModule,
     AgentModule,
     GithubModule,

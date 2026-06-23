@@ -3,7 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { ENV_CONFIG } from '../config/config.tokens';
 import { EnvConfig } from '../config/env.schema';
-import { TaskRecord } from '../supabase/task.types';
+import { TaskRecord } from '../task/task.types';
 import {
   TASK_JOB_EXECUTE,
   TASK_QUEUE_NAME,

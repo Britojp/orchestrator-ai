@@ -1,4 +1,4 @@
-import { TaskRecord } from '../supabase/task.types';
+import { TaskRecord } from '../task/task.types';
 
 export interface AgentRunResult {
   summary: string;

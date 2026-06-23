@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Project {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  created_at    DateTime       @default(now()) @db.Timestamptz
+  updated_at    DateTime       @updatedAt @db.Timestamptz
+  conversations Conversation[]
+  tasks         Task[]
+
+  @@map("projects")
+}
+
+model Conversation {
+  id         String    @id @default(uuid())
+  project_id String
+  project    Project   @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  title      String?
+  created_at DateTime  @default(now()) @db.Timestamptz
+  updated_at DateTime  @updatedAt @db.Timestamptz
+  messages   Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id              String       @id @default(uuid())
+  conversation_id String
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  role            String
+  content         String
+
+  prompt          String?
+  provider        String?
+  model           String?
+
+  created_at      DateTime     @default(now()) @db.Timestamptz
+
+  @@map("messages")
+}
+
+model AIProvider {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  created_at  DateTime          @default(now()) @db.Timestamptz
+  providerKeys UserProviderKey[]
+
+  @@map("ai_providers")
+}
+
+model UserProviderKey {
+  id            String     @id @default(uuid())
+  provider_id   String
+  provider      AIProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+  encrypted_key String
+  created_at    DateTime   @default(now()) @db.Timestamptz
+
+  @@map("user_provider_keys")
+}
+
+model Task {
+  id                  String    @id @default(uuid())
+  project_id          String?
+  project             Project?  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  title               String
+  description         String
+  acceptance_criteria String
+  status              String    @default("pending")
+  priority            Int       @default(0) @db.SmallInt
+  branch_base         String?
+  branch_name         String?
+  pr_url              String?
+  pr_number           Int?
+  agent_run_id        String?
+  agent_agent_id      String?
+  error_message       String?
+  retry_count         Int       @default(0) @db.SmallInt
+  claimed_by          String?
+  claimed_at          DateTime? @db.Timestamptz
+  started_at          DateTime? @db.Timestamptz
+  completed_at        DateTime? @db.Timestamptz
+  failed_at           DateTime? @db.Timestamptz
+  created_at          DateTime  @default(now()) @db.Timestamptz
+  updated_at          DateTime  @updatedAt @db.Timestamptz
+
+  @@index([status, created_at])
+  @@index([status, claimed_at])
+  @@map("tasks")
+}

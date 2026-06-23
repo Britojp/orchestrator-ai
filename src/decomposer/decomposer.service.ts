@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ENV_CONFIG } from '../config/config.tokens';
 import { EnvConfig } from '../config/env.schema';
-import { TaskRecord } from '../supabase/task.types';
+import { TaskRecord } from '../task/task.types';
 
 export interface SubTaskDef {
   title: string;

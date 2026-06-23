@@ -3,7 +3,7 @@ import type { SDKMessage } from '@cursor/sdk';
 import { Logger } from '@nestjs/common';
 import { getExeca } from '../../../common/execa-loader';
 import { EnvConfig } from '../../../config/env.schema';
-import { TaskRecord } from '../../../supabase/task.types';
+import { TaskRecord } from '../../../task/task.types';
 import { buildAgentPromptSections } from '../../../workflow/workflow-rules';
 import { AgentRunResult, IAgentProvider } from '../../agent-provider.interface';
 import { buildProjectSupabaseMcpConfig } from './project-supabase-mcp.factory';

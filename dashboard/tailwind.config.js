@@ -1,0 +1,46 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{vue,js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
+          950: '#0a0a0a',
+        },
+      },
+      borderRadius: {
+        'card': '16px',
+        'input': '12px',
+        'button': '12px',
+        'dialog': '20px',
+      },
+      boxShadow: {
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      },
+      transitionDuration: {
+        'fast': '150ms',
+        'normal': '300ms',
+        'slow': '500ms',
+      },
+      transitionTimingFunction: {
+        'fast': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'normal': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'slow': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      }
+    },
+  },
+  plugins: [],
+}

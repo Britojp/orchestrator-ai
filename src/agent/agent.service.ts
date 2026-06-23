@@ -1,5 +1,5 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { TaskRecord } from '../supabase/task.types';
+import { TaskRecord } from '../task/task.types';
 import { AgentRunResult, IAgentProvider } from './agent-provider.interface';
 import { AGENT_PROVIDER } from './agent.tokens';
 
